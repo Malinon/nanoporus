@@ -2,6 +2,7 @@ import julia
 import numpy as np
 
 LAMMPS_HEADER_ATOMS = "Atoms"
+MAX_X_TAG = "xhi"
 
 def write_entry(input_line, grid_step, output_grid):
     nums_str = input_line.split(" ")
@@ -10,10 +11,19 @@ def write_entry(input_line, grid_step, output_grid):
     z = int(float(nums_str[4]) /  grid_step)
     output_grid[x, y, z] = True
 
-def read_material_from_file(path, grid_size=200, grid_step=2.023):
+def get_max_x_from_line(input_line, grid_step):
+    parts = input_line.split(" ")
+    return round(float(parts[1]) / grid_step)
+
+def read_material_from_file(path, grid_step=2.023, i=0):
     input_file = open(path, 'r')
     lines = input_file.readlines()
     line_idx = 0
+    while not MAX_X_TAG in lines[line_idx]:
+        line_idx += 1
+    grid_size = get_max_x_from_line(lines[line_idx], grid_step)
+    if grid_size > 250:
+        print(i)
     while not LAMMPS_HEADER_ATOMS in lines[line_idx]:
         line_idx += 1
     line_idx += 2
