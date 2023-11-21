@@ -18,7 +18,7 @@ function calculate_filtration(input_grid, filtrator)
 end
 
 function calculate_zcone_filtration(input_grid)
-    filtrator = ConFiltratorZ(10.0, (0.0, 0.0, 20.0))
+    filtrator = ConFiltratorZ(20.0, (0.0, 0.0, 40.0))
     return calculate_filtration(input_grid, filtrator)
 end
 
