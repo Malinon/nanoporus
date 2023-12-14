@@ -20,7 +20,7 @@ labels_path ="../../"
 def test_out(a):
     return "out_test"
 
-#load_and_preprocess.prepare_data(params, get_data_file_name, labels_path, test_out)
+load_and_preprocess.prepare_data(params, get_data_file_name, labels_path, test_out)
 datas = joblib.load("out_test")
 
 best_mod = cv_model_select.find_best_model_rf(datas, use_yield=True)

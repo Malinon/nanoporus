@@ -40,15 +40,17 @@ def get_impact_heat_map_from_lasso(lasso_reg, dim, name):
     plt.savefig(name)
 
 class ResultReport:
-    def __init__(self, model, splited_data, use_yield, data_type, is_lasso):
+    def __init__(self, model, splited_data, use_yield, data_type, is_lasso, filt_params):
         self.model = model
         self.prediction_test = self.model.predict(splited_data.test_dgms)
         self.splited_data = splited_data
         self.use_yield = use_yield
         self.data_type = data_type
         self.is_lasso = is_lasso
+        self.filt_params = filt_params
     def get_intro(self):
-        return "The best model for whole dataset is " + str(self.model['Estimator'])
+        return ("The best model for " + str(self.data_type) + " dataset is " + str(self.model.best_estimator_['Estimator'])
+                + "\n Filtration: radius " + str(self.filt_params.radius) +", height " + str(self.filt_params.height))
     def get_metrics_results(self):
         output_dict = {}
         _, test_labs = self.splited_data.get_labels(self.use_yield)
@@ -60,10 +62,10 @@ class ResultReport:
         names = [ str(self.data_type) + "_importance_dim_" + str(dim) + ".png"  for dim in range(3)]
         if self.is_lasso:
             for dim in range(3):
-                get_impact_heat_map_from_lasso(self.model, dim, names[dim]) 
+                get_impact_heat_map_from_lasso(self.model.best_estimator_, dim, names[dim]) 
         else:
             for dim in range(3):
-                get_impact_heat_map_from_rf(self.model, dim, names[dim])
+                get_impact_heat_map_from_rf(self.model.best_estimator_, dim, names[dim])
         return names
     def get_result_img_by_path(self):
         name = str(self.data_type) + "_result.png"
@@ -121,8 +123,17 @@ def print_report_to_pdf(result_report):
     paths = result_report.get_importances_img_by_path()
     for path in paths:
         pdf.image(path,  w = IMG_WIDTH)
-    pdf.output('best_'+ str(self.use_yield) + str(self.data_type) + '.pdf', 'F')
+    pdf.output('/home/xardas/best_'+ str(result_report.use_yield) + str(result_report.data_type) + '.pdf', 'F')
 
-def generate_report(model, splited_data, use_yield, data_type, is_lasso):
-    report = ResultReport(model, splited_data, use_yield, data_type, is_lasso)
+def generate_report(model, splited_data, use_yield, data_type, is_lasso, filt_params):
+    report = ResultReport(model, splited_data, use_yield, data_type, is_lasso, filt_params)
     print_report_to_pdf(report)
+
+def plot_score_for_filtration(best_for_filtration, filtrations_params, name):
+    plt.clf()
+    plt.cla()
+    fig, ax = plt.subplots()
+    ax.plot([a.radius for a in filtrations_params], best_for_filtration)
+    ax.set_xlabel("radius")
+    ax.set_ylabel("score")
+    plt.savefig("/home/xardas/" + name)

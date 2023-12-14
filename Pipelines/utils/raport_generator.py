@@ -126,3 +126,10 @@ def print_report_to_pdf(result_report):
 def generate_report(model, splited_data, use_yield, data_type, is_lasso):
     report = ResultReport(model, splited_data, use_yield, data_type, is_lasso)
     print_report_to_pdf(report)
+
+def plot_score_for_filtration(best_for_filtration, filtrations_params, name):
+    plt.clf()
+    plt.cla()
+    plt.plot([filt.radius for filt in filtrations_params], best_for_filtration, '.r-')
+    plt.title("Score for filtration")
+    plt.savefig(name)

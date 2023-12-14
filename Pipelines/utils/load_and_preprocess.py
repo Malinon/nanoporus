@@ -31,13 +31,16 @@ def load_labels(path, feature_name):
     return labs_top + labs_rand
 
 
+def load_from_csv(path):
+    return [np.loadtxt(str(i) + path, dtype=float, delimiter=",") for i in range(3)]
+
 """ This function vectorise persistence intervals (perisistence image), split data and dump it"""
 def prepare_data(filtration_params, data_file_name_generator, labels_path, output_name_generator):
     gudhi_diag_selector = gd.representations.DiagramSelector(use=True,limit=np.inf, point_type="finite")
     select = lambda x: ([ [ gudhi_diag_selector(x[i][j]) for j in range(len(x[i]))] for i in range(len(x)) ])
-    dgms_topo = select(joblib.load(data_file_name_generator(filtration_params, True)))
-    dgms_rand = select(joblib.load(data_file_name_generator(filtration_params, False)))
-    data = np.transpose(np.concatenate((np.array(dgms_topo), np.array(dgms_rand)), axis=1))
+    dgms_topo = select(load_from_csv(data_file_name_generator(filtration_params, True)))
+    dgms_rand = select(load_from_csv(data_file_name_generator(filtration_params, False)))
+    data = np.transpose(load_from_csv((np.array(dgms_topo), np.array(dgms_rand)), axis=1))
     yield_labels = load_labels(labels_path, "yield")
     modulus_labels = load_labels(labels_path, "modulus")
     idxs_all = [i for i in range(len(yield_labels))]
