@@ -1,44 +1,50 @@
+import networkx as nx
+from .common_flow import SOURCE_NODE, SINK_NODE, create_slice, is_in_circle
 
+def get_left_neighbour(vertex, center, radius_squared):
+    if is_in_circle(radius_squared, center, vertex[0] + 1, vertex[1]):
+        return (vertex[0] + 1, vertex[1], vertex[2])
 
-def is_in_circle(radius_squared, center, x, y):
-    return (x - center[0])**2 + (y - center[1])**2 <= radius_squared
-def create_slice(radius, center, data_shape):
-    MIN_Y = max(0, center[1] - radius)
-    MAX_Y = min(data_shape[1], center[1] + radius)
-    RADIUS_SQUARED = radius ** 2
-    points_in_circle = []
-    for x in range(max(0, center[0] - radius), min(data_shape[0], center[0] + radius)):
-        for y in range(MIN_Y, MAX_Y):
-            if is_in_circle(RADIUS_SQUARED, center, x, y):
-                points_in_circle.append((x,y))
-    return points_in_circle
+def get_up_neighbour(vertex, center, radius_squared):
+    if is_in_circle(radius_squared, center, vertex[0] , vertex[1] + 1):
+        return (vertex[0], vertex[1] + 1, vertex[2])
 
+def get_next_z_neighbour(vertex):
+    return (vertex[0], vertex[1], vertex[2] + 1)
 
-def get_left_neighbour():
-    pass
-def get_up_neighbour():
-    pass
-def get_next_z_neighbour()
+def update_graph_by_slice(graph, radius_squared, circle_slice, z, stop_z, center, data):
+    for p in circle_slice:
+        if data[p[0], p[1], z]:
+            v = (p[0], p[1], z)
+            graph.add_node(v)
+            left_neighbour =  get_left_neighbour(v, center, radius_squared)
+            if not left_neighbour == None and data[left_neighbour[0], left_neighbour[1], left_neighbour[2]]:
+                graph.add_edge(v, left_neighbour, capacity = 1)
+            up_neighbour =  get_up_neighbour(v, center, radius_squared)
+            if not up_neighbour == None and data[up_neighbour[0], up_neighbour[1], up_neighbour[2]]:
+                graph.add_edge(v, up_neighbour, capacity = 1)
+            if z < stop_z:
+                z_neighbour = get_next_z_neighbour(v)
+                if data[z_neighbour[0], z_neighbour[1], z_neighbour[2]]:
+                    graph.add_edge(v, z_neighbour, capacity = 1) 
 
 def create_lattice_neighoubr_graph(point, data, height, radius):
     graph = nx.Graph()
-    nx.add_vertex(SOURCE_NODE)
+    graph.add_node(SOURCE_NODE)
     START_Z = max(0, point[2] - height)
     STOP_Z = min(data.shape[2], point[2] + height)
-    # Add first layer of cylinder into the graph
-    init_nodes = []
-    # TODO:
-    for z in range(START_Z, STOP_Z):
-        for p in circle_slice:
-            v = (p[0], p[1], z)
-            graph.add_vertex(vertex)
-            left_neighbour =  get_left_neighbour(v)
-            if not left_neighbour == None
-                graph.add_edge(v, left_neighbour, capcity = 1)
-            up_neighbour =  get_up_neighbour(v)
-            if not up_neighbour == None
-                graph.add_edge(v, up_neighbour, capcity = 1)
-            graph.add_edge(v, get_next_z_neighbour(v), capcity = 1)
-
-    graph.add_vertex(SINK_NODE)
+    CENTER = (point[0], point[1])
+    RADIUS_SQUARED = radius ** 2
+    circle_slice = create_slice(radius, CENTER, data.shape)
+    for z in range(START_Z, STOP_Z + 1):
+        update_graph_by_slice(graph, RADIUS_SQUARED, circle_slice, z, STOP_Z, CENTER, data)
+    # Add connection of first slice with source (infinit capacity)
+    for p in circle_slice:
+        if data[p[0], p[1], START_Z]:
+            graph.add_edge((p[0], p[1], START_Z), SOURCE_NODE, capacity=2)
+    # Add last slice with sink
+    graph.add_node(SINK_NODE)
+    for p in circle_slice:
+        if data[p[0], p[1], STOP_Z]:
+            graph.add_edge((p[0], p[1], STOP_Z), SINK_NODE, capacity=2)
     return graph
