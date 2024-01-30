@@ -5,13 +5,13 @@ struct WeightedConeFiltratorZ
     max_Y::Int64
     max_Z::Int64
     normalized_vector::Tuple{Float64, Float64, Float64}
-    function ConFiltratorZ(radius::Float64, vector::Tuple{Float64, Float64, Float64})
+    function WeightedConeFiltratorZ(radius::Float64, vector::Tuple{Float64, Float64, Float64})
         h = sqrt(vector[1]^2 + vector[2]^2 + vector[3]^2)
         new(h, radius, ceil(radius), ceil(radius), abs(ceil(vector[3])), (vector[1] / h, vector[2] / h, vector[3] /h ))
     end
 end
 
-function get_weighted_impact(cFiltrator::ConFiltratorZ, x, y, z, x_tip, y_tip, z_tip, height_multiplier, radius_multiplier)
+function get_weighted_impact(cFiltrator::WeightedConeFiltratorZ, x, y, z, x_tip, y_tip, z_tip, height_multiplier, radius_multiplier)
     x_diff = x_tip - x
     y_diff = y_tip - y
     z_diff = z_tip - z
@@ -29,7 +29,7 @@ function get_weighted_impact(cFiltrator::ConFiltratorZ, x, y, z, x_tip, y_tip, z
     end
 end
 
-function call(cFiltrator::ConFiltratorZ, x, y, z, input_grid::Array{Bool}, radius_multiplier, height_multiplier)
+function call(cFiltrator::WeightedConeFiltratorZ, x, y, z, input_grid::Array{Bool}, radius_multiplier, height_multiplier)
     weights_full_sum = 0.0
     weights_empty_sum = 0.0
     GRID_SHAPE = size(input_grid)
@@ -41,11 +41,10 @@ function call(cFiltrator::ConFiltratorZ, x, y, z, input_grid::Array{Bool}, radiu
         for j in START_J:STOP_J
             for k in START_K:STOP_K
                 weight = get_weighted_impact(cFiltrator, i, j, k, x, y, z, height_multiplier, radius_multiplier)
-                    if input_grid[i, j, k]
-                        weights_full_sum += weight
-                    else
-                        weights_empty_sum += weight
-                    end
+                if input_grid[i, j, k]
+                    weights_full_sum += weight
+                else
+                    weights_empty_sum += weight
                 end
             end
         end
