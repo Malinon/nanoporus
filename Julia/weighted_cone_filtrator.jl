@@ -11,6 +11,22 @@ struct WeightedConeFiltratorZ
     end
 end
 
+"""
+    get_weighted_impact(cFiltrator::WeightedConeFiltratorZ, x, y, z, x_tip, y_tip, z_tip, height_multiplier, radius_multiplier)
+
+Calculates the weighted impact of a point on a weighted cone filtrator.
+
+# Arguments
+- `cFiltrator::WeightedConeFiltratorZ`: The weighted cone filtrator object.
+- `x, y, z`: The coordinates of the point.
+- `x_tip, y_tip, z_tip`: The coordinates of the tip of the cone.
+- `height_multiplier`: The height multiplier.
+- `radius_multiplier`: The radius multiplier.
+
+# Returns
+- If the point is within the cone, it returns the weighted impact value.
+- If the point is outside the cone, it returns `0`.
+"""
 function get_weighted_impact(cFiltrator::WeightedConeFiltratorZ, x, y, z, x_tip, y_tip, z_tip, height_multiplier, radius_multiplier)
     x_diff = x_tip - x
     y_diff = y_tip - y

@@ -3,6 +3,19 @@ def __is_in_range(x, y, z, data):
 
 
 def get_weighted_cube_filtration(point, data, z_multiplier = 0.5, xy_multiplier = 0.5, range_filt=5):
+    """
+    Calculates the weighted cube filtration value for a given point in a 3D data array.
+
+    Parameters:
+    - point (tuple): The coordinates of the point in the data array.
+    - data (ndarray): The 3D data array.
+    - z_multiplier (float): The multiplier for the z-axis weight. Default is 0.5.
+    - xy_multiplier (float): The multiplier for the x and y-axis weight. Default is 0.5.
+    - range_filt (int): The range of the cube filtration. Default is 5.
+
+    Returns:
+    - filtration_value (float): The calculated weighted cube filtration value.
+    """
     filtration_value = 0.0
     entries_weight = 0
     for z in range(range_filt):
