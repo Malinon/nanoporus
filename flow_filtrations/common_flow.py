@@ -5,6 +5,9 @@ def is_in_circle(radius_squared, center, x, y):
     return (x - center[0])**2 + (y - center[1])**2 <= radius_squared
 
 def create_slice(radius, center, data_shape):
+    """
+    Create a slice of the data with a given radius and center
+    """
     MIN_Y = max(0, center[1] - radius)
     MAX_Y = min(data_shape[1] - 1, center[1] + radius)
     RADIUS_SQUARED = radius ** 2

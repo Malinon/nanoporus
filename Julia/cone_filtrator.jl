@@ -1,3 +1,20 @@
+"""
+    struct ConFiltratorZ
+
+A struct representing a cone-shaped filtrator in 3D space.
+
+# Fields
+- `height::Float64`: The height of the cone.
+- `radius::Float64`: The radius of the cone.
+- `max_X::Int64`: The maximum X-coordinate value.
+- `max_Y::Int64`: The maximum Y-coordinate value.
+- `max_Z::Int64`: The maximum Z-coordinate value.
+- `normalized_vector::Tuple{Float64, Float64, Float64}`: The normalized vector representing the direction of the cone.
+
+# Constructors
+- `ConFiltratorZ(radius::Float64, vector::Tuple{Float64, Float64, Float64})`: Constructs a `ConFiltratorZ` object with the given radius and vector.
+
+"""
 struct ConFiltratorZ
     height::Float64
     radius::Float64
@@ -11,6 +28,19 @@ struct ConFiltratorZ
     end
 end
 
+"""
+    isPointInCones(cFiltrator::ConFiltratorZ, x, y, z, x_tip, y_tip, z_tip)
+
+Check if a point is inside the cones defined by a cone filtrator.
+
+# Arguments
+- `cFiltrator::ConFiltratorZ`: The cone filtrator object.
+- `x, y, z`: The coordinates of the point.
+- `x_tip, y_tip, z_tip`: The coordinates of the tip of the cone.
+
+# Returns
+- `true` if the point is inside the cones, `false` otherwise.
+"""
 function isPointInCones(cFiltrator::ConFiltratorZ, x, y, z, x_tip, y_tip, z_tip)
     x_diff = x_tip - x
     y_diff = y_tip - y
@@ -25,6 +55,25 @@ function isPointInCones(cFiltrator::ConFiltratorZ, x, y, z, x_tip, y_tip, z_tip)
     return orth_distance <= cone_radius
 end
 
+"""
+    call(cFiltrator::ConFiltratorZ, x, y, z, input_grid::Array{Bool})
+
+Compute the ratio of points inside cones to the total number of points in a given region.
+
+# Arguments
+- `cFiltrator::ConFiltratorZ`: The cone filtrator object.
+- `x`: The x-coordinate of the center point.
+- `y`: The y-coordinate of the center point.
+- `z`: The z-coordinate of the center point.
+- `input_grid::Array{Bool}`: The input grid containing boolean values indicating whether a point is occupied or not.
+
+# Returns
+The ratio of points inside cones to the total number of points in the region.
+
+"""
+function call(cFiltrator::ConFiltratorZ, x, y, z, input_grid::Array{Bool})
+    # function body
+end
 function call(cFiltrator::ConFiltratorZ, x, y, z, input_grid::Array{Bool})
     inside_cones_empty = 0.0
     inside_cones_full = 0.0
