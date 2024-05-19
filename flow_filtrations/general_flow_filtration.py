@@ -13,14 +13,16 @@ def gen_flow_filtration(data, grapher, flow_func=nx.maximum_flow_value):
     grapher: function
         A function that generates a graph given a point and data
     """
-    filtration = np.empty(shape=data.shape, dtype=float)
+    filtration = np.empty(shape=(data.shape[0], data.shape[1], data.shape[2], 3) , dtype=float)
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
             for k in range(data.shape[2]):
-                filtration[i,j,k] = flow_func(grapher((i, j, k), data), SOURCE_NODE, SINK_NODE)
+                multifiltration = flow_func(grapher((i, j, k), data), SOURCE_NODE, SINK_NODE)
+                for fil_idx in range(3):
+                    filtration[i,j,k, fil_idx] = multifiltration[fil_idx]
     return filtration
 
-def gen_avg_direction_flow_filtration(graph, source_node, sink_node, graph_shape):
+def gen_avg_direction_flow_filtration(graph, source_node, sink_node):
     filtration_value, edge_flow = nx.maximum_flow(graph, source_node, sink_node)
     starting_nodes = set(node for node in graph.neighbors(source_node))
     end_nodes = set(node for node in graph.neighbors(sink_node))
