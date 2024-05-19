@@ -1,3 +1,3 @@
-from .general_flow_filtration import gen_flow_filtration
+from .general_flow_filtration import gen_flow_filtration, gen_avg_direction_flow_filtration
 from .lattice_neighbour_graph import create_lattice_neighoubr_graph
 from .common_flow import SINK_NODE, SOURCE_NODE

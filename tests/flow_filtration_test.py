@@ -4,7 +4,7 @@ sys.path.append('../')
 
 import numpy as np
 import networkx as nx
-from flow_filtrations import create_lattice_neighoubr_graph, SOURCE_NODE, SINK_NODE
+from flow_filtrations import create_lattice_neighoubr_graph, SOURCE_NODE, SINK_NODE, gen_avg_direction_flow_filtration
 
 class TestNeighbourLatticeFlow(unittest.TestCase):
     def test_empty_cylinder_flow(self):
@@ -68,6 +68,31 @@ class TestNeighbourLatticeFlow(unittest.TestCase):
         self.assertEqual(nx.number_of_edges(graph), 10)
         flow_value, _ = nx.maximum_flow(graph, SOURCE_NODE, SINK_NODE)
         self.assertEqual(flow_value, 1)
+
+    def test_zig_zag_flow_avg_direction(self):
+        input_grid = np.full((50, 50, 50), False)
+        # Make Zig zag path
+        input_grid[25, 24, 23] = True
+        input_grid[25, 24, 24] = True
+        input_grid[25, 25, 24] = True
+        input_grid[25, 25, 25] = True
+        input_grid[26, 25, 25] = True
+        input_grid[26, 26, 25] = True
+        input_grid[26, 26, 26] = True
+        input_grid[25, 26, 26] = True
+        input_grid[25, 26, 27] = True
+        graph = create_lattice_neighoubr_graph((25,25, 25), input_grid, 2, 2)
+        multi_filtration = gen_avg_direction_flow_filtration(graph, SOURCE_NODE, SINK_NODE)
+        self.assertEqual(multi_filtration, (0, 2, 4))
+
+    def test_empty_slice_flow(self):
+        input_grid = np.full((50, 50, 50), True)
+        for x in range(50):
+            for y in range(50):
+                input_grid[x, y, 25] = False
+        graph = create_lattice_neighoubr_graph((25,25,25), input_grid, 4, 2)
+        multi_filtration = gen_avg_direction_flow_filtration(graph, SOURCE_NODE, SINK_NODE)
+        self.assertEqual(multi_filtration, (0, 0, 0))
 
 if __name__ == '__main__':
     unittest.main()
